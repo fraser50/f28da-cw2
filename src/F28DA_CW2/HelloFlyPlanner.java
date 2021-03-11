@@ -1,47 +1,90 @@
 package F28DA_CW2;
 
+import java.util.Iterator;
+import java.util.Scanner;
+
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class HelloFlyPlanner {
 
 	public static void main(String[] args) {
-		
-		// The following code is from HelloJGraphT.java of the org.jgrapth.demo package
-		
-		System.err.println("The example code is from HelloJGraphT.java from the org.jgrapt.demo package.");
-		System.err.println("Use similar code to build the small graph from Preliminary Part by hand.");
-		System.err.println("Note that you will need to use a different graph class as SimpleGraph since your graph is not just a Simple Graph.");
-		System.err.println("Once you understand how to build such graph by hand, move to Part A to build a more substantial graph.");
-		// Code is from HelloJGraphT.java of the org.jgrapth.demo package (start)
-        Graph<String, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
-
-        String v1 = "v1";
-        String v2 = "v2";
-        String v3 = "v3";
-        String v4 = "v4";
-
-        // add the vertices
-        g.addVertex(v1);
-        g.addVertex(v2);
-        g.addVertex(v3);
-        g.addVertex(v4);
-
-        // add edges to create a circuit
-        g.addEdge(v1, v2);
-        g.addEdge(v2, v3);
-        g.addEdge(v3, v4);
-        g.addEdge(v4, v1);
-
-        // note undirected edges are printed as: {<v1>,<v2>}
-        System.out.println("-- toString output");
-        // @example:toString:begin
-        System.out.println(g.toString());
-        // @example:toString:end
-        System.out.println();
-		// Code is from HelloJGraphT.java of the org.jgrapth.demo package (start)
+        Graph<String, DefaultEdge> g = new SimpleDirectedWeightedGraph<>(DefaultEdge.class);
         
+        String c1, c2, c3, c4, c5;
+        
+        c1 = "Edinburgh";
+        c2 = "Heathrow";
+        c3 = "Dubai";
+        c4 = "Sydney";
+        c5 = "Kuala Lumpur";
+        
+        g.addVertex(c1);
+        g.addVertex(c2);
+        g.addVertex(c3);
+        g.addVertex(c4);
+        g.addVertex(c5);
+        
+        addDoubleEdge(g, c1, c2, 80);
+        addDoubleEdge(g, c2, c3, 130);
+        addDoubleEdge(g, c2, c4, 570);
+        addDoubleEdge(g, c3, c5, 170);
+        addDoubleEdge(g, c3, c1, 190);
+        addDoubleEdge(g, c5, c4, 150);
+        
+        System.out.println("The following airports are available:");
+        for (String s : g.vertexSet()) {
+        	System.out.println(" " + s);
+        }
+        
+        System.out.println("Please enter a starting airport:");
+        Scanner scan = new Scanner(System.in);
+        
+        String startNode = scan.nextLine();
+        if (!g.containsVertex(startNode)) {
+        	System.err.println("Airport doesn't exist!");
+        	scan.close();
+        	return;
+        }
+        
+        System.out.println("Please enter the destination airport:");
+        
+        String endNode = scan.nextLine();
+        if (!g.containsVertex(endNode)) {
+        	System.err.println("Airport doesn't exist!");
+        	scan.close();
+        	return;
+        }
+        
+        scan.close();
+        DijkstraShortestPath<String, DefaultEdge> cheapestPath = new DijkstraShortestPath<>(g);
+        GraphPath<String, DefaultEdge> path = cheapestPath.getPath(startNode, endNode);
+        
+        System.out.println("Printing shortest path:");
+        Iterator<String> iter = path.getVertexList().iterator();
+        
+        String curr = iter.next();
+        
+        while (iter.hasNext()) {
+        	String end = iter.next();
+        	
+        	System.out.println(" " + curr + " -> " + end);
+        	curr = end;
+        }
+        
+        System.out.println("Total cost: £" + (int)path.getWeight());
+        
+	}
+	
+	private static void addDoubleEdge(Graph<String, DefaultEdge> g, String v1, String v2, int weight) {
+		DefaultEdge e1 = g.addEdge(v1, v2);
+		DefaultEdge e2 = g.addEdge(v2, v1);
+		
+		g.setEdgeWeight(e1, weight);
+		g.setEdgeWeight(e2, weight);
 	}
 
 }
