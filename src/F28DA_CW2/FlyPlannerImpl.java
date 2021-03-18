@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyPlannerB<AirportImpl,FlightImpl> {
 	private Graph<AirportImpl, FlightImpl> g;
@@ -14,6 +15,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 	
 	public FlyPlannerImpl() {
 		airportFromCode = new HashMap<>();
+		g = new SimpleDirectedWeightedGraph<>(FlightImpl.class);
 		
 	}
 
