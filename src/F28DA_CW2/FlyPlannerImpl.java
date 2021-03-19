@@ -1,5 +1,6 @@
 package F28DA_CW2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyPlannerB<AirportImpl,FlightImpl> {
@@ -104,8 +107,23 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public TripImpl leastCost(String from, String to) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		AirportImpl fromAP = airport(from);
+		AirportImpl toAP = airport(to);
+		DijkstraShortestPath<AirportImpl, FlightImpl> dsp = new DijkstraShortestPath<>(g);
+		GraphPath<AirportImpl, FlightImpl> fp = dsp.getPath(fromAP, toAP);
+		
+		List<String> vertexList = new ArrayList<>();
+		List<String> edgeList = new ArrayList<>();
+		
+		for (AirportImpl v : fp.getVertexList()) {
+			vertexList.add(v.getCode());
+		}
+		
+		for (FlightImpl e : fp.getEdgeList()) {
+			edgeList.add(e.getFlightCode());
+		}
+		
+		return new TripImpl(vertexList, edgeList, (int) fp.getWeight());
 	}
 
 	@Override
