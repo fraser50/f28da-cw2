@@ -74,6 +74,20 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			g.addVertex(ai);
 		}
 		
+		// UA0557,SDF,0513,DEN,0654,113
+		// Flight Code, departure, dep time, dest, dest time, cost
+		
+		for (String[] fl : flights) {
+			AirportImpl from = airport(fl[1]);
+			AirportImpl to = airport(fl[3]);
+			
+			FlightImpl flight = new FlightImpl(fl[0], to, from, fl[2], fl[4], Integer.parseInt(fl[5]));
+			g.addEdge(from, to, flight);
+			
+			g.setEdgeWeight(flight, flight.getCost());
+			
+		}
+		
 		return true;
 	}
 
