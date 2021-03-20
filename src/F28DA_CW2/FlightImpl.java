@@ -1,6 +1,9 @@
 package F28DA_CW2;
 
-public class FlightImpl implements Flight {
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+@SuppressWarnings("serial")
+public class FlightImpl extends DefaultWeightedEdge implements Flight {
 	private String flightCode;
 	private AirportImpl to;
 	private AirportImpl from;
