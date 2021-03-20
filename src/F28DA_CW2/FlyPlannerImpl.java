@@ -15,9 +15,11 @@ import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyPlannerB<AirportImpl,FlightImpl> {
 	private Graph<AirportImpl, FlightImpl> g;
 	private Map<String, AirportImpl> airportFromCode;
+	private Map<String, FlightImpl> flightFromCode;
 	
 	public FlyPlannerImpl() {
 		airportFromCode = new HashMap<>();
+		flightFromCode = new HashMap<>();
 		g = new SimpleDirectedWeightedGraph<>(FlightImpl.class);
 		
 	}
@@ -89,6 +91,8 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			
 			g.setEdgeWeight(flight, flight.getCost());
 			
+			flightFromCode.put(flight.getFlightCode(), flight);
+			
 		}
 		
 		return true;
@@ -101,8 +105,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public FlightImpl flight(String code) {
-		// TODO Auto-generated method stub
-		return null;
+		return flightFromCode.get(code);
 	}
 
 	@Override
@@ -123,7 +126,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			edgeList.add(e.getFlightCode());
 		}
 		
-		return new TripImpl(vertexList, edgeList, (int) fp.getWeight());
+		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
 	}
 
 	@Override

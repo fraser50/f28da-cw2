@@ -1,6 +1,7 @@
 package F28DA_CW2;
 
 import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class FlyPlannerMain {
 
@@ -14,8 +15,31 @@ public class FlyPlannerMain {
 		try {
 			fi.populate(new FlightsReader());
 
-			// Implement here your user interface using the methods of Part A. You could
-			// optionally expand it to use the methods of Part B.
+			System.out.println("Departure airport code?");
+			Scanner scan = new Scanner(System.in);
+			
+			String deptCode = scan.next();
+			
+			if (fi.airport(deptCode) == null) {
+				System.err.println("That airport doesn't exist!");
+				return;
+			}
+			
+			System.out.println("Arrival airport code?");
+			String destCode = scan.next();
+			
+			if (fi.airport(destCode) == null) {
+				System.err.println("That airport doesn't exist!");
+				return;
+			}
+			
+			AirportImpl depart = fi.airport(deptCode);
+			AirportImpl dest = fi.airport(destCode);
+			
+			TripImpl trip = fi.leastCost(deptCode, destCode);
+			
+			System.out.println("Trip for " + depart.getName() + " (" + depart.getCode() + ") to " + dest.getName() + " (" + dest.getCode() + ")");
+			System.out.println(trip);
 
 		} catch (FileNotFoundException | FlyPlannerException e) {
 			e.printStackTrace();
