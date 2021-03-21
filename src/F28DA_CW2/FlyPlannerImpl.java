@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
@@ -131,8 +132,24 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public TripImpl leastHop(String from, String to) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		AirportImpl fromAP = airport(from);
+		AirportImpl toAP = airport(to);
+		
+		BFSShortestPath<AirportImpl, FlightImpl> bsp = new BFSShortestPath<>(g);
+		GraphPath<AirportImpl, FlightImpl> fp = bsp.getPath(fromAP, toAP);
+		
+		List<String> vertexList = new ArrayList<>();
+		List<String> edgeList = new ArrayList<>();
+		
+		for (AirportImpl v : fp.getVertexList()) {
+			vertexList.add(v.getCode());
+		}
+		
+		for (FlightImpl e : fp.getEdgeList()) {
+			edgeList.add(e.getFlightCode());
+		}
+		
+		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
 	}
 
 	@Override
