@@ -3,6 +3,7 @@ package F28DA_CW2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,8 +155,29 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public TripImpl leastCost(String from, String to, List<String> excluding) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		Set<FlightImpl> removedEdges = new HashSet<>();
+		
+		for (String ex : excluding) {
+			AirportImpl exAP = airport(ex);
+			Iterator<FlightImpl> currEdges = g.edgesOf(exAP).iterator();
+			while (currEdges.hasNext()) {
+				removedEdges.add(currEdges.next());
+			}
+			
+			g.removeAllEdges(g.edgesOf(exAP));
+		}
+		
+		TripImpl trip = leastCost(from, to);
+		
+		Iterator<FlightImpl> toAdd = removedEdges.iterator();
+		
+		while (toAdd.hasNext()) {
+			FlightImpl flight = toAdd.next();
+			g.addEdge(flight.getFrom(), flight.getTo(), flight);
+			g.setEdgeWeight(flight, flight.getCost());
+		}
+		
+		return trip;
 	}
 
 	@Override
