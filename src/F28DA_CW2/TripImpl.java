@@ -5,6 +5,7 @@ import java.util.List;
 
 public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportImpl, FlightImpl> {
 	private static final String FORMAT_STRING = "%1$-3s %2$-20s %3$-4s %4$-6s %5$-20s %6$-4s";
+	private static final int DAY_IN_MINUTES = 24 * 60;
 	private List<String> stops;
 	private List<String> flights;
 	private int cost;
@@ -19,14 +20,31 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 
 	@Override
 	public int connectingTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		int total = 0;
+		
+		Iterator<String> iter = flights.iterator();
+		if (!iter.hasNext()) {
+			return total;
+		}
+		
+		FlightImpl flight = fi.flight(iter.next());
+		int startTime = timeStrToMinutes(flight.getToGMTime());
+		
+		while (iter.hasNext()) {
+			flight = fi.flight(iter.next());
+			int endTime = timeStrToMinutes(flight.getToGMTime());
+			
+			int diff = timeDiffInMinutes(startTime, endTime);
+			startTime = endTime;
+			total += diff;
+		}
+		
+		return total;
 	}
 
 	@Override
 	public int totalTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return airTime() + connectingTime();
 	}
 
 	@Override
@@ -51,8 +69,22 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 
 	@Override
 	public int airTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		int total = 0;
+		
+		for (String flightCode : flights) {
+			FlightImpl flight = fi.flight(flightCode);
+			String startStr = flight.getFromGMTime();
+			String endStr = flight.getToGMTime();
+			
+			int start = timeStrToMinutes(startStr);
+			int end = timeStrToMinutes(endStr);
+			
+			int diff = timeDiffInMinutes(start, end);
+			
+			total += diff;
+		}
+		
+		return total;
 	}
 	
 	@Override
@@ -71,12 +103,37 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 			s += String.format("\n"+FORMAT_STRING, curr, fromAP.getName() + " (" + fromAP.getCode() + ")", flight.getFromGMTime(), flight.getFlightCode(),
 					toAP.getName() + " (" + toAP.getCode() + ")", flight.getToGMTime());
 			
-			s += "\nTotal trip cost = £" + totalCost();
-			
 			curr++;
 		}
 		
+		s += "\nTotal Trip Cost = £" + totalCost();
+		s += "\nTotal Time in the Air = " + airTime();
+		
 		return s;
+	}
+	
+	private int timeStrToMinutes(String s) {
+		if (s.length() != 4) {
+			throw new IllegalArgumentException("Invalid time string provided!");
+		}
+		
+		String hourStr = s.substring(0, 2);
+		String minStr = s.substring(2, 4);
+		
+		int hours = Integer.parseInt(hourStr);
+		int minutes = Integer.parseInt(minStr);
+		
+		return (hours*60) + minutes;
+	}
+	
+	private int timeDiffInMinutes(int start, int end) {
+		int result = end - start;
+		
+		if (result <= 0) {
+			result += DAY_IN_MINUTES;
+		}
+		
+		return result;
 	}
 
 }
