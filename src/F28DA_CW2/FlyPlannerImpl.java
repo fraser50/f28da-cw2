@@ -28,8 +28,17 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public Set<AirportImpl> directlyConnected(AirportImpl airport) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<AirportImpl> connectedSet = new HashSet<>();
+		
+		for (AirportImpl ap : g.vertexSet()) {
+			if (ap == airport) continue; // Skip if the airport is the same
+			
+			if (g.containsEdge(airport, ap) && g.containsEdge(ap, airport)) {
+				connectedSet.add(ap);
+			}
+		}
+		
+		return connectedSet;
 	}
 
 	@Override
