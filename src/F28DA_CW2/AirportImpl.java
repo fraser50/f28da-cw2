@@ -5,6 +5,8 @@ import java.util.Set;
 public class AirportImpl implements AirportA, AirportB {
 	private String code;
 	private String name;
+	private int order;
+	private Set<AirportImpl> directlyConnected;
 	
 	public AirportImpl(String code, String name) {
 		this.code = code;
@@ -13,26 +15,24 @@ public class AirportImpl implements AirportA, AirportB {
 
 	@Override
 	public Set<AirportImpl> getDicrectlyConnected() {
-		// TODO Auto-generated method stub
-		return null;
+		return directlyConnected;
 	}
 
 	@Override
 	public void setDicrectlyConnected(Set<AirportImpl> dicrectlyConnected) {
-		// TODO Auto-generated method stub
+		this.directlyConnected = dicrectlyConnected;
 		
 	}
 
 	@Override
 	public void setDicrectlyConnectedOrder(int order) {
-		// TODO Auto-generated method stub
+		this.order = order;
 		
 	}
 
 	@Override
 	public int getDirectlyConnectedOrder() {
-		// TODO Auto-generated method stub
-		return 0;
+		return order;
 	}
 
 	@Override

@@ -43,8 +43,16 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public int setDirectlyConnected() {
-		// TODO Auto-generated method stub
-		return 0;
+		int total = 0;
+		
+		for (AirportImpl airport : g.vertexSet()) {
+			Set<AirportImpl> connected = directlyConnected(airport);
+			airport.setDicrectlyConnected(connected);
+			airport.setDicrectlyConnectedOrder(connected.size());
+			total += connected.size();
+		}
+		
+		return total;
 	}
 
 	@Override
