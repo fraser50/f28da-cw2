@@ -71,6 +71,8 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 			s += String.format("\n"+FORMAT_STRING, curr, fromAP.getName() + " (" + fromAP.getCode() + ")", flight.getFromGMTime(), flight.getFlightCode(),
 					toAP.getName() + " (" + toAP.getCode() + ")", flight.getToGMTime());
 			
+			s += "\nTotal trip cost = £" + totalCost();
+			
 			curr++;
 		}
 		
