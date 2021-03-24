@@ -18,6 +18,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 	private Graph<AirportImpl, FlightImpl> g;
 	private Map<String, AirportImpl> airportFromCode;
 	private Map<String, FlightImpl> flightFromCode;
+	private Graph<AirportImpl, FlightImpl> DAG;
 	
 	public FlyPlannerImpl() {
 		airportFromCode = new HashMap<>();
@@ -69,14 +70,46 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public String leastCostMeetUp(String at1, String at2) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		AirportImpl AP1 = airport(at1);
+		AirportImpl AP2 = airport(at2);
+		DijkstraShortestPath<AirportImpl, FlightImpl> dsp = new DijkstraShortestPath<>(g);
+		//GraphPath<AirportImpl, FlightImpl> fp = dsp.get
+		double lowestDistance = Integer.MAX_VALUE;
+		String suitableAP = "";
+		
+		for (AirportImpl ap : g.vertexSet()) {
+			if (ap == AP1 || ap == AP2) continue;
+			double distance = dsp.getPathWeight(AP1, ap) + dsp.getPathWeight(AP2, ap);
+			
+			if (distance < lowestDistance) {
+				lowestDistance = distance;
+				suitableAP = ap.getCode();
+			}
+		}
+		
+		return suitableAP;
 	}
 
 	@Override
 	public String leastHopMeetUp(String at1, String at2) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		AirportImpl AP1 = airport(at1);
+		AirportImpl AP2 = airport(at2);
+		BFSShortestPath<AirportImpl, FlightImpl> dsp = new BFSShortestPath<>(g);
+		//GraphPath<AirportImpl, FlightImpl> fp = dsp.get
+		double lowestDistance = Integer.MAX_VALUE;
+		String suitableAP = "";
+		
+		for (AirportImpl ap : g.vertexSet()) {
+			if (ap == AP1 || ap == AP2) continue;
+			double distance = dsp.getPathWeight(AP1, ap) + dsp.getPathWeight(AP2, ap);
+			
+			if (distance < lowestDistance) {
+				lowestDistance = distance;
+				suitableAP = ap.getCode();
+			}
+		}
+		
+		return suitableAP;
 	}
 
 	@Override
@@ -172,6 +205,27 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public TripImpl leastCost(String from, String to, List<String> excluding) throws FlyPlannerException {
+		Set<FlightImpl> removedEdges = removeAirportFlights(excluding);
+		
+		TripImpl trip = leastCost(from, to);
+		
+		addAirportFlights(removedEdges);
+		
+		return trip;
+	}
+
+	@Override
+	public TripImpl leastHop(String from, String to, List<String> excluding) throws FlyPlannerException {
+		Set<FlightImpl> removedEdges = removeAirportFlights(excluding);
+		
+		TripImpl trip = leastHop(from, to);
+		
+		addAirportFlights(removedEdges);
+		
+		return trip;
+	}
+	
+	private Set<FlightImpl> removeAirportFlights(List<String> excluding) {
 		Set<FlightImpl> removedEdges = new HashSet<>();
 		
 		for (String ex : excluding) {
@@ -184,8 +238,10 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			g.removeAllEdges(g.edgesOf(exAP));
 		}
 		
-		TripImpl trip = leastCost(from, to);
-		
+		return removedEdges;
+	}
+	
+	private void addAirportFlights(Set<FlightImpl> removedEdges) {
 		Iterator<FlightImpl> toAdd = removedEdges.iterator();
 		
 		while (toAdd.hasNext()) {
@@ -193,14 +249,6 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			g.addEdge(flight.getFrom(), flight.getTo(), flight);
 			g.setEdgeWeight(flight, flight.getCost());
 		}
-		
-		return trip;
-	}
-
-	@Override
-	public TripImpl leastHop(String from, String to, List<String> excluding) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
