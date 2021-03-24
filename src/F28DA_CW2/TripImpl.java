@@ -32,10 +32,10 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 		
 		while (iter.hasNext()) {
 			flight = fi.flight(iter.next());
-			int endTime = timeStrToMinutes(flight.getToGMTime());
+			int endTime = timeStrToMinutes(flight.getFromGMTime());
 			
 			int diff = timeDiffInMinutes(startTime, endTime);
-			startTime = endTime;
+			startTime = timeStrToMinutes(flight.getToGMTime());
 			total += diff;
 		}
 		
