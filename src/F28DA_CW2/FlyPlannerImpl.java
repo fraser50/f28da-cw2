@@ -12,13 +12,14 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyPlannerB<AirportImpl,FlightImpl> {
 	private Graph<AirportImpl, FlightImpl> g;
 	private Map<String, AirportImpl> airportFromCode;
 	private Map<String, FlightImpl> flightFromCode;
-	private Graph<AirportImpl, FlightImpl> DAG;
+	private Graph<AirportImpl, FlightImpl> dag;
 	
 	public FlyPlannerImpl() {
 		airportFromCode = new HashMap<>();
@@ -58,14 +59,36 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public int setDirectlyConnectedOrder() {
-		// TODO Auto-generated method stub
-		return 0;
+		dag = new DirectedAcyclicGraph<>(FlightImpl.class);
+		for (AirportImpl ap : g.vertexSet()) {
+			dag.addVertex(ap);
+		}
+		
+		for (AirportImpl ap : g.vertexSet()) {
+			for (FlightImpl flight : g.outgoingEdgesOf(ap)) {
+				AirportImpl newAP = flight.getTo();
+				if (newAP.getDirectlyConnectedOrder() > ap.getDirectlyConnectedOrder()) {
+					dag.addEdge(ap, newAP, flight);
+				}
+			}
+		}
+		
+		return dag.edgeSet().size();
 	}
 
 	@Override
 	public Set<AirportImpl> getBetterConnectedInOrder(AirportImpl airport) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<AirportImpl> directlyConnected = new HashSet<>();
+		
+		for (FlightImpl flight : dag.edgesOf(airport)) {
+			if (flight.getTo() == airport) {
+				directlyConnected.add(flight.getFrom());
+				continue;
+			}
+			directlyConnected.add(flight.getTo());
+		}
+		
+		return directlyConnected;
 	}
 
 	@Override
@@ -73,7 +96,6 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		AirportImpl AP1 = airport(at1);
 		AirportImpl AP2 = airport(at2);
 		DijkstraShortestPath<AirportImpl, FlightImpl> dsp = new DijkstraShortestPath<>(g);
-		//GraphPath<AirportImpl, FlightImpl> fp = dsp.get
 		double lowestDistance = Integer.MAX_VALUE;
 		String suitableAP = "";
 		
