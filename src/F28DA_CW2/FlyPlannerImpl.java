@@ -19,7 +19,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 	private Graph<AirportImpl, FlightImpl> g;
 	private Map<String, AirportImpl> airportFromCode;
 	private Map<String, FlightImpl> flightFromCode;
-	private Graph<AirportImpl, FlightImpl> dag;
+	private DirectedAcyclicGraph<AirportImpl, FlightImpl> dag;
 	
 	public FlyPlannerImpl() {
 		airportFromCode = new HashMap<>();
@@ -81,17 +81,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public Set<AirportImpl> getBetterConnectedInOrder(AirportImpl airport) {
-		Set<AirportImpl> directlyConnected = new HashSet<>();
-		
-		for (FlightImpl flight : dag.edgesOf(airport)) {
-			if (flight.getTo() == airport) {
-				directlyConnected.add(flight.getFrom());
-				continue;
-			}
-			directlyConnected.add(flight.getTo());
-		}
-		
-		return directlyConnected;
+		return dag.getDescendants(airport);
 	}
 
 	@Override
