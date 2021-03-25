@@ -51,6 +51,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			Set<AirportImpl> connected = directlyConnected(airport);
 			airport.setDicrectlyConnected(connected);
 			airport.setDicrectlyConnectedOrder(connected.size());
+			// Store Directly connected set and size of set in the airport object
 			total += connected.size();
 		}
 		
@@ -62,6 +63,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		dag = new DirectedAcyclicGraph<>(FlightImpl.class);
 		for (AirportImpl ap : g.vertexSet()) {
 			dag.addVertex(ap);
+			// Add each airport to the DAG
 		}
 		
 		for (AirportImpl ap : g.vertexSet()) {
@@ -69,6 +71,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 				AirportImpl newAP = flight.getTo();
 				if (newAP.getDirectlyConnectedOrder() > ap.getDirectlyConnectedOrder()) {
 					dag.addEdge(ap, newAP, flight);
+					// Add all outgoing flights that are going to an airport with more direct connections
 				}
 			}
 		}
@@ -102,10 +105,12 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		for (AirportImpl ap : g.vertexSet()) {
 			if (ap == AP1 || ap == AP2) continue;
 			double distance = dsp.getPathWeight(AP1, ap) + dsp.getPathWeight(AP2, ap);
+			// Find the total distance travelled for both airports
 			
 			if (distance < lowestDistance) {
 				lowestDistance = distance;
 				suitableAP = ap.getCode();
+				// If the distance is shorter than the previous shortest, update it
 			}
 		}
 		
@@ -117,9 +122,9 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		AirportImpl AP1 = airport(at1);
 		AirportImpl AP2 = airport(at2);
 		BFSShortestPath<AirportImpl, FlightImpl> dsp = new BFSShortestPath<>(g);
-		//GraphPath<AirportImpl, FlightImpl> fp = dsp.get
-		double lowestDistance = Integer.MAX_VALUE;
-		String suitableAP = "";
+		
+		double lowestDistance = Integer.MAX_VALUE; // Setting to MAX_VALUE so it is larger than any possible distance
+		String suitableAP = ""; // Suitable airport code
 		
 		for (AirportImpl ap : g.vertexSet()) {
 			if (ap == AP1 || ap == AP2) continue;
@@ -166,6 +171,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			g.setEdgeWeight(flight, flight.getCost());
 			
 			flightFromCode.put(flight.getFlightCode(), flight);
+			// Record flight code in map to allow easy lookups
 			
 		}
 		
@@ -239,6 +245,11 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		return trip;
 	}
 	
+	/**
+	 * This method will remove all flights that were to or from an excluded airport and will return the removed flights
+	 * @param excluding airports to exclude
+	 * @return set of flights that were removed from the graph
+	 */
 	private Set<FlightImpl> removeAirportFlights(List<String> excluding) {
 		Set<FlightImpl> removedEdges = new HashSet<>();
 		
@@ -255,6 +266,10 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		return removedEdges;
 	}
 	
+	/**
+	 * This method will re-add flights that were removed by the previous method.
+	 * @param removedEdges
+	 */
 	private void addAirportFlights(Set<FlightImpl> removedEdges) {
 		Iterator<FlightImpl> toAdd = removedEdges.iterator();
 		
@@ -265,6 +280,11 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		}
 	}
 	
+	/**
+	 * This method will take a flight path and will return a String list containing the codes for all airports in the path.
+	 * @param fp The flight path that should be used to generate a String list of vertices
+	 * @return A String list of Vertices
+	 */
 	private List<String> createVertexList(GraphPath<AirportImpl, FlightImpl> fp) {
 		List<String> vertexList = new ArrayList<>();
 		
@@ -275,6 +295,11 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		return vertexList;
 	}
 	
+	/**
+	 * This method will take a flight path and will return a String list containing the codes for all flights in the path.
+	 * @param fp The flight path that should be used to generate a String list of edges
+	 * @return A String list of Edges
+	 */
 	private List<String> createEdgeList(GraphPath<AirportImpl, FlightImpl> fp) {
 		List<String> edgeList = new ArrayList<>();
 		
