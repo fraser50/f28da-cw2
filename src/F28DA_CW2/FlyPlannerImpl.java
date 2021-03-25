@@ -189,16 +189,12 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		DijkstraShortestPath<AirportImpl, FlightImpl> dsp = new DijkstraShortestPath<>(g);
 		GraphPath<AirportImpl, FlightImpl> fp = dsp.getPath(fromAP, toAP);
 		
-		List<String> vertexList = new ArrayList<>();
-		List<String> edgeList = new ArrayList<>();
-		
-		for (AirportImpl v : fp.getVertexList()) {
-			vertexList.add(v.getCode());
+		if (fp == null) {
+			throw new FlyPlannerException("No path available!");
 		}
 		
-		for (FlightImpl e : fp.getEdgeList()) {
-			edgeList.add(e.getFlightCode());
-		}
+		List<String> vertexList = createVertexList(fp);
+		List<String> edgeList = createEdgeList(fp);
 		
 		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
 	}
@@ -211,16 +207,12 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		BFSShortestPath<AirportImpl, FlightImpl> bsp = new BFSShortestPath<>(g);
 		GraphPath<AirportImpl, FlightImpl> fp = bsp.getPath(fromAP, toAP);
 		
-		List<String> vertexList = new ArrayList<>();
-		List<String> edgeList = new ArrayList<>();
-		
-		for (AirportImpl v : fp.getVertexList()) {
-			vertexList.add(v.getCode());
+		if (fp == null) {
+			throw new FlyPlannerException("No path available!");
 		}
 		
-		for (FlightImpl e : fp.getEdgeList()) {
-			edgeList.add(e.getFlightCode());
-		}
+		List<String> vertexList = createVertexList(fp);
+		List<String> edgeList = createEdgeList(fp);
 		
 		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
 	}
@@ -271,6 +263,26 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			g.addEdge(flight.getFrom(), flight.getTo(), flight);
 			g.setEdgeWeight(flight, flight.getCost());
 		}
+	}
+	
+	private List<String> createVertexList(GraphPath<AirportImpl, FlightImpl> fp) {
+		List<String> vertexList = new ArrayList<>();
+		
+		for (AirportImpl v : fp.getVertexList()) {
+			vertexList.add(v.getCode());
+		}
+		
+		return vertexList;
+	}
+	
+	private List<String> createEdgeList(GraphPath<AirportImpl, FlightImpl> fp) {
+		List<String> edgeList = new ArrayList<>();
+		
+		for (FlightImpl e : fp.getEdgeList()) {
+			edgeList.add(e.getFlightCode());
+		}
+		
+		return edgeList;
 	}
 
 }
