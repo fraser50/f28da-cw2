@@ -141,8 +141,31 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public String leastTimeMeetUp(String at1, String at2, String startTime) throws FlyPlannerException {
-		// TODO Auto-generated method stub
-		return null;
+		AirportImpl AP1 = airport(at1);
+		AirportImpl AP2 = airport(at2);
+		BFSShortestPath<AirportImpl, FlightImpl> dsp = new BFSShortestPath<>(g);
+		
+		int lowestTime = Integer.MAX_VALUE; // Setting to MAX_VALUE so it is larger than any possible time
+		String suitableAP = ""; // Suitable airport code
+		
+		for (AirportImpl ap : g.vertexSet()) {
+			if (ap == AP1 || ap == AP2) continue;
+			GraphPath<AirportImpl, FlightImpl> path1 = dsp.getPath(AP1, ap);
+			GraphPath<AirportImpl, FlightImpl> path2 = dsp.getPath(AP2, ap);
+			if (path1 == null || path2 == null) continue;
+			
+			TripImpl trip1 = new TripImpl(createVertexList(path1), createEdgeList(path1), 0, this);
+			TripImpl trip2 = new TripImpl(createVertexList(path2), createEdgeList(path2), 0, this);
+			
+			int time = trip1.totalTime() + trip2.totalTime();
+			
+			if (time < lowestTime) {
+				lowestTime = time;
+				suitableAP = ap.getCode();
+			}
+		}
+		
+		return suitableAP;
 	}
 
 	@Override
