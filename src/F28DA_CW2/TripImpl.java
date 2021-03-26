@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportImpl, FlightImpl> {
-	private static final String FORMAT_STRING = "%1$-3s %2$-20s %3$-4s %4$-6s %5$-20s %6$-4s";
+	private static final String FORMAT_STRING = "%1$-3s %2$-_leave_s %3$-4s %4$-6s %5$-_arrive_s %6$-4s";
 	private static final int DAY_IN_MINUTES = 24 * 60;
 	private List<String> stops;
 	private List<String> flights;
@@ -89,7 +89,24 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 	
 	@Override
 	public String toString() {
-		String s = String.format(FORMAT_STRING, "Leg", "Leave", "At", "On", "Arrive", "At");
+		int leaveLen = 0; // Length of largest Leave AP string
+		int arriveLen = 0; // Length of largest Arrive AP string
+		
+		for (String flightCode : getFlights()) {
+			FlightImpl flight = fi.flight(flightCode);
+			String flightLeave = flight.getFrom().getName() + " (" + flight.getFrom().getCode() + ")";
+			String flightArrive = flight.getTo().getName() + " (" + flight.getTo().getCode() + ")";
+			
+			if (flightLeave.length() > leaveLen) leaveLen = flightLeave.length();
+			if (flightArrive.length() > arriveLen) arriveLen = flightArrive.length();
+		}
+		
+		// Minimum padding (in reality no airport is likely to have less than 7 characters in the name)
+		leaveLen = leaveLen > 5 ? leaveLen : 5;
+		arriveLen = arriveLen > 6 ? arriveLen : 6;
+		
+		String suitableFormatStr = FORMAT_STRING.replaceAll("_leave_", String.valueOf(leaveLen)).replaceAll("_arrive_", String.valueOf(arriveLen));
+		String s = String.format(suitableFormatStr, "Leg", "Leave", "At", "On", "Arrive", "At");
 		
 		int curr = 1;
 		
@@ -100,7 +117,7 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 			FlightImpl flight = fi.flight(flightCode);
 			AirportImpl fromAP = flight.getFrom();
 			AirportImpl toAP = flight.getTo();
-			s += String.format("\n"+FORMAT_STRING, curr, fromAP.getName() + " (" + fromAP.getCode() + ")", flight.getFromGMTime(), flight.getFlightCode(),
+			s += String.format("\n"+suitableFormatStr, curr, fromAP.getName() + " (" + fromAP.getCode() + ")", flight.getFromGMTime(), flight.getFlightCode(),
 					toAP.getName() + " (" + toAP.getCode() + ")", flight.getToGMTime());
 			
 			curr++;
