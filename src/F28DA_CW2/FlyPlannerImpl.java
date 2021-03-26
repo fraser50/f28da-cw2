@@ -81,7 +81,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 
 	@Override
 	public Set<AirportImpl> getBetterConnectedInOrder(AirportImpl airport) {
-		return dag.getDescendants(airport);
+		return dag.getDescendants(airport); // Every airport in the DAG that can be reached from the provided airport
 	}
 
 	@Override
