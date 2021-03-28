@@ -104,6 +104,10 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			}
 		}
 		
+		if (suitableAP.equals("")) {
+			throw new FlyPlannerException("No suitable meetup location!");
+		}
+		
 		return suitableAP;
 	}
 
@@ -124,6 +128,10 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 				lowestDistance = distance;
 				suitableAP = ap.getCode();
 			}
+		}
+		
+		if (suitableAP.equals("")) {
+			throw new FlyPlannerException("No suitable meetup location!");
 		}
 		
 		return suitableAP;
@@ -153,6 +161,10 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 				lowestTime = time;
 				suitableAP = ap.getCode();
 			}
+		}
+		
+		if (suitableAP.equals("")) {
+			throw new FlyPlannerException("No suitable meetup location!");
 		}
 		
 		return suitableAP;
