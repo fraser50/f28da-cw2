@@ -152,8 +152,8 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 			GraphPath<AirportImpl, FlightImpl> path2 = dsp.getPath(AP2, ap);
 			if (path1 == null || path2 == null) continue;
 			
-			TripImpl trip1 = new TripImpl(createVertexList(path1), createEdgeList(path1), 0, this);
-			TripImpl trip2 = new TripImpl(createVertexList(path2), createEdgeList(path2), 0, this);
+			TripImpl trip1 = new TripImpl(createVertexList(path1), createEdgeList(path1), this);
+			TripImpl trip2 = new TripImpl(createVertexList(path2), createEdgeList(path2), this);
 			
 			int time = trip1.totalTime() + trip2.totalTime();
 			
@@ -227,7 +227,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		List<String> vertexList = createVertexList(fp);
 		List<String> edgeList = createEdgeList(fp);
 		
-		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
+		return new TripImpl(vertexList, edgeList, this);
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public class FlyPlannerImpl implements FlyPlannerA<AirportImpl,FlightImpl>, FlyP
 		List<String> vertexList = createVertexList(fp);
 		List<String> edgeList = createEdgeList(fp);
 		
-		return new TripImpl(vertexList, edgeList, (int) fp.getWeight(), this);
+		return new TripImpl(vertexList, edgeList, this);
 	}
 
 	@Override

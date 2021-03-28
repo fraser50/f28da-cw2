@@ -8,13 +8,11 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 	private static final int DAY_IN_MINUTES = 24 * 60;
 	private List<String> stops;
 	private List<String> flights;
-	private int cost;
 	private FlyPlannerImpl fi;
 	
-	public TripImpl(List<String> stops, List<String> flights, int cost, FlyPlannerImpl fi) {
+	public TripImpl(List<String> stops, List<String> flights, FlyPlannerImpl fi) {
 		this.stops = stops;
 		this.flights = flights;
-		this.cost = cost;
 		this.fi = fi;
 	}
 
@@ -64,6 +62,12 @@ public class TripImpl implements TripA<AirportImpl, FlightImpl>, TripB<AirportIm
 
 	@Override
 	public int totalCost() {
+		int cost = 0;
+		for (String flightCode : getFlights()) {
+			FlightImpl flight = fi.flight(flightCode);
+			cost += flight.getCost();
+		}
+		
 		return cost;
 	}
 
